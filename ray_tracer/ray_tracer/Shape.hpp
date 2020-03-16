@@ -23,7 +23,7 @@ public:
     std::vector<Vec3> location;
     //0 for circle, 1 for triangle, 2 for polygon
     int shapeType;
-    //materials: 0 = diffues, 1 = reflective;
+    //materials: 0 = diffuse, 1 = reflective;
     int shapeMaterial;
     Vec3 color;
     Vec3 specular;

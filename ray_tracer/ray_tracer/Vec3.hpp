@@ -18,17 +18,20 @@ public:
     Vec3();
     Vec3(float x_in, float y_in, float z_in);
     
-//    void Add(Vec3 b);
+    
+    Vec3 Add(Vec3 b);
 //
 //    void Subtract(Vec3 b);
 //
 //    void ScalarMultiplication(float s);
 //
-//    float Mag();
-//
-//    void Normalize();
-//
-//    float Dot(Vec3 b);
+    float Magnitude();
+    Vec3 Normalize();
+    float Dot(Vec3 b);
+    Vec3  Subtract(Vec3 b);
+    Vec3 Scale(float b);
+    Vec3 Multiply(Vec3 b);
+    Vec3 Cross(Vec3 b);
 //
 //    void Lerp(Vec3 b, float t);
 //
