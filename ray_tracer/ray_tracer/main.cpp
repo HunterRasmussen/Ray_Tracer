@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <math.h>
+#include <cmath>
 #include <string.h>
 #include <vector>
 
@@ -58,53 +59,40 @@ std::vector<Shape> initializeShapesScenell()
 {
     //circle1
     std::vector<Vec3> sphereLocation  = {Vec3(0,0.3,0), Vec3(.2,.2,.2)};
-    Shape circle = Shape(0, sphereLocation, 1, Vec3(0,0,1), Vec3(1,1,1));
+    Shape circle = Shape(0, sphereLocation, 1, Vec3(0,0,1), Vec3(1,1,1), 4);
     //triangle 1
 //    Triangle 0 -.5 .5   1 .5 0   0 -.5 -.5    Material Diffuse 0 0 1 SpecularHighlight 1 1 1 PhongConstant 4
     std::vector<Vec3> triangleVerts = {Vec3(0,-0.5,0.5), Vec3(1,0.5,0) , Vec3(0,-0.5,-0.5)};
-    Shape tri1 = Shape(1, triangleVerts, 1, Vec3(0,0,1), Vec3(1,1,1));
-    std::vector<Shape> shapes = {circle, tri1};
+    Shape tri1 = Shape(1, triangleVerts, 1, Vec3(0,0,1), Vec3(1,1,1), 4);
+    
+    std::vector<Vec3> triangle2Verts = {Vec3(0,-0.5,0.5), Vec3(0,-0.5,-0.5) , Vec3(-1,0.5,0)};
+    Shape tri2 = Shape(1, triangle2Verts, 1, Vec3(0,0,1), Vec3(1,1,1), 4);
+    
+    std::vector<Shape> shapes = {circle, tri1, tri2};
     return shapes;
 }
 
 
-//Vec3 findSphereIntersection(Ray ray, std::vector<Vec3> location)
-//{
-//
-//}
-
-
-bool isInsidePoly(std::vector<std::vector<float>> vertices)
+Vec3 computeNormal(std::vector<Vec3> vertices)
 {
-    int signHolder = 0;
-    int nextSignHolder = 0;
-    int numCrossings = 0;
-    float intersectionPoint = 0;
-    
-    if(vertices.at(0).at(1) < 0)
-    {
-        signHolder = -1;
-    }
-    else
-    {
-        signHolder = 1;
-    }
-    for(int i = 0; i < vertices.size(); i++)
-    {
-        if i == vertices.size() -1
-    }
-    
-}
-
-//returns -1.0 if it doesn't intersect polygon
-// otherwise returns t, the parameter value for solving the intersection
-float intersectsPolygon(Ray ray, std::vector<Vec3> vertices)
-{
-    
     Vec3 edge1 = vertices.at(0).Subtract(vertices.at(1));
     Vec3 edge2 = vertices.at(1).Subtract(vertices.at(2));
     Vec3 normal = edge1.Cross(edge2);
     normal = normal.Normalize();
+    return normal;
+}
+
+//bool isInsideTriangle(std::vector<std::vector<float>> vertices)
+//{
+//    
+//}
+
+//returns normal of triangle if intersection
+//otherwise returns vec(-1.0,"","")'
+float intersectstriangle(Ray ray, std::vector<Vec3> vertices)
+{
+    
+    Vec3 normal = computeNormal(vertices);
     float D = normal.Dot(vertices.at(0));
     float vd =  normal.Dot(ray.direction);//normal dot ray origin
     if(vd > 0) //normal is facing away from camera.  Culled
@@ -124,52 +112,68 @@ float intersectsPolygon(Ray ray, std::vector<Vec3> vertices)
     }
     
     Vec3 intersectionPoint = ray.origin.Add(ray.direction.Scale(t));
-    std::vector<float> projectedIntersectionPoint = {};
-    std::vector<std::vector<float>> projectedPolygonVertices = {};
-
-    if (abs(normal.x) >= abs(normal.y) && abs(normal.x) >= abs(normal.z)) //normal.x has largest mag
+    Vec3 e0 = vertices.at(1).Subtract(vertices.at(0));
+    Vec3 e1 = vertices.at(2).Subtract(vertices.at(1));
+    Vec3 e2 = vertices.at(0).Subtract(vertices.at(2));
+    Vec3 C0 = intersectionPoint.Subtract(vertices.at(0));
+    Vec3 C1 = intersectionPoint.Subtract(vertices.at(1));
+    Vec3 C2 = intersectionPoint.Subtract(vertices.at(2));
+    Vec3 cp1 = e0.Cross(C0);
+    Vec3 cp2 = e1.Cross(C1);
+    Vec3 cp3 = e2.Cross(C2);
+    if(normal.Dot(cp1) > 0 &&
+       normal.Dot(cp2) > 0 &&
+       normal.Dot(cp3) > 0)
     {
-        projectedIntersectionPoint.push_back(intersectionPoint.y);
-        projectedIntersectionPoint.push_back(intersectionPoint.z);
-        for(int i = 0; i < vertices.size(); i++)
-        {
-            Vec3 curVertex = vertices.at(i);
-            std::vector<float> vertex = {curVertex.y, curVertex.z};
-            projectedPolygonVertices.push_back(vertex);
-        }
+        return t;
     }
-    else if(abs(normal.y) >= abs(normal.x) && abs(normal.y) >= (normal.z)) //normal.y has largest mag
-    {
-        projectedIntersectionPoint.push_back(intersectionPoint.x);
-        projectedIntersectionPoint.push_back(intersectionPoint.z);
-        for(int i = 0; i < vertices.size(); i++)
-        {
-            Vec3 curVertex = vertices.at(i);
-            std::vector<float> vertex = {curVertex.x, curVertex.z};
-            projectedPolygonVertices.push_back(vertex);
-        }
-    }
-    else //normal.z has largest mag
-    {
-        projectedIntersectionPoint.push_back(intersectionPoint.x);
-        projectedIntersectionPoint.push_back(intersectionPoint.y);
-        for(int i = 0; i < vertices.size(); i++)
-        {
-            Vec3 curVertex = vertices.at(i);
-            std::vector<float> vertex = {curVertex.x, curVertex.y};
-            projectedPolygonVertices.push_back(vertex);
-        }
-    }
-    
-    for(int i = 0; i < projectedPolygonVertices.size(); i++) //translate all vertices
-    {
-        std::vector<float> curVertex = projectedPolygonVertices.at(i);
-        curVertex.at(0) = curVertex.at(0)- projectedIntersectionPoint.at(0);
-        curVertex.at(1) = curVertex.at(1)- projectedIntersectionPoint.at(1);
-    }
-    
-    bool isInside = isInsidePoly(projectedPolygonVertices);
-    
+    return -1.0;
+//    std::vector<float> projectedIntersectionPoint = {};
+//    std::vector<std::vector<float>> projectedtriangleVertices = {};
+//
+//    if (abs(normal.x) >= abs(normal.y) && abs(normal.x) >= abs(normal.z)) //normal.x has largest mag
+//    {
+//        projectedIntersectionPoint.push_back(intersectionPoint.y);
+//        projectedIntersectionPoint.push_back(intersectionPoint.z);
+//        for(int i = 0; i < vertices.size(); i++)
+//        {
+//            Vec3 curVertex = vertices.at(i);
+//            std::vector<float> vertex = {curVertex.y, curVertex.z};
+//            projectedtriangleVertices.push_back(vertex);
+//        }
+//    }
+//    else if(abs(normal.y) >= abs(normal.x) && abs(normal.y) >= (normal.z)) //normal.y has largest mag
+//    {
+//        projectedIntersectionPoint.push_back(intersectionPoint.x);
+//        projectedIntersectionPoint.push_back(intersectionPoint.z);
+//        for(int i = 0; i < vertices.size(); i++)
+//        {
+//            Vec3 curVertex = vertices.at(i);
+//            std::vector<float> vertex = {curVertex.x, curVertex.z};
+//            projectedtriangleVertices.push_back(vertex);
+//        }
+//    }
+//    else //normal.z has largest mag
+//    {
+//        projectedIntersectionPoint.push_back(intersectionPoint.x);
+//        projectedIntersectionPoint.push_back(intersectionPoint.y);
+//        for(int i = 0; i < vertices.size(); i++)
+//        {
+//            Vec3 curVertex = vertices.at(i);
+//            std::vector<float> vertex = {curVertex.x, curVertex.y};
+//            projectedtriangleVertices.push_back(vertex);
+//        }
+//    }
+//
+//    for(int i = 0; i < projectedtriangleVertices.size(); i++) //translate all vertices
+//    {
+//        std::vector<float> curVertex = projectedtriangleVertices.at(i);
+//        curVertex.at(0) = curVertex.at(0)- projectedIntersectionPoint.at(0);
+//        curVertex.at(1) = curVertex.at(1)- projectedIntersectionPoint.at(1);
+//    }
+//
+//    bool isInside = isInsideTriangle(projectedtriangleVertices);
+//
     
 
     
@@ -185,17 +189,6 @@ float intersectsSphere(Ray ray, std::vector<Vec3> location)
     float R = location.at(1).x;
     float C = oc.Dot(oc) - R;
     float discriminant = B*B - 4*A*C;
-//    std::cout << "Discriminant = " << discriminant << std::endl;
-//    if(ray.direction.x == 0 && ray.direction.y == 0)
-//    {
-//        std::cout << std::endl << std::endl << "Center Pixel" << std::endl;
-//        std::cout << "A = "  << A << " B = " << B << " C = " << C << std::endl;
-//        std::cout << "R = " << R << std::endl;
-//        std::cout << "Origin =  " << ray.origin.x << ", "  << ray.origin.y << ", " << ray.origin.z << std::endl;
-//        std::cout << "Direction =  " << ray.direction.x << ", "  << ray.direction.y << ", " << ray.direction.z << std::endl;
-//        std::cout << "Center =  " << location.at(0).x << ", "  << location.at(0).y << ", " << location.at(0).z << std::endl;
-//        std::cout << "Discriminant = " << discriminant << std::endl;
-//    }
     if(discriminant < 0)
     {
         return -1.0;
@@ -212,56 +205,163 @@ float intersectsSphere(Ray ray, std::vector<Vec3> location)
     }
 }
 
-Vec3 calculateRay(Ray ray, std::vector<Shape> shapes)
+Vec3 calculateColor(Vec3 normal, Shape shape, Ray ray, bool shadow)
 {
-    float t_intsersect = intersectsSphere(ray, shapes.at(0).location);
-    if (t_intsersect > 0)
+    if(shadow)
     {
-        Vec3 intersectionPoint = ray.origin.Add(ray.direction.Scale(t_intsersect));
-        Vec3 normal = shapes.at(0).location.at(0).Add(intersectionPoint).Normalize();
-        Vec3 ambient = shapes.at(0).color.Multiply(ambientColor);
-        Vec3 diffuse = shapes.at(0).color.Multiply(lightColor);
-        float ndotL = normal.Dot(directionToLight);
-        diffuse = diffuse.Scale(ndotL);
-        return diffuse.Add(ambient);
-//        std::cout << "Normal = " << normal.x << " " << normal.y << " " << normal.z << std::endl;
-//        Vec3 toReturn = Vec3(normal.x + 1, normal.y + 1, normal.z + 1).Scale(0.5f);
-//        std::cout << "To return = " << toReturn.x << " " << toReturn.y << " " << toReturn.z << std::endl;
-        
-//        return toReturn;
+        return shape.color.Multiply(ambientColor);
+
     }
+    normal = normal.Normalize();
+    Vec3 ambient = shape.color.Multiply(ambientColor);
+    Vec3 diffuse = shape.color.Multiply(lightColor);
+    float ndotL = normal.Dot(directionToLight);
+    diffuse = diffuse.Scale(ndotL);
     
-    t_intsersect = intersectsPolygon(ray, shapes.at(0).location);
     
-    return backgroundColor;
-//    int indexofClosestIntersectingShape = -1;
-//    for(int i = 0; i < shapes.size(); i++)
-//    {
-//        if (shapes.at(i).shapeType == 0) //a sphere
-//        {
-//            Vec3 intersectionPoint = intersectsSphere(ray, shapes.at(i).location);
-//            if (intersectionPoint.x != -1000)
-//            {
-//                return shapes.at(i).color;
-//            }
-//            else
-//            {
-//                return backgroundColor;
-//            }
-//        }
-//        //TODO findPolygonIntersection
-//        else
-//        {
-//            return backgroundColor;
-//        }
-//    }
-//    return backgroundColor;
+    Vec3 V = ray.direction.Add(ray.origin);
+    float ndotLight = normal.Dot(directionToLight);
+    ndotLight *= 2;
+    Vec3 R = normal.Scale(ndotLight);
+    R = directionToLight.Subtract(R);
+    float VdotR = V.Dot(R);
+    VdotR = std::pow(VdotR, shape.phong);
+    Vec3 finalSpec = shape.specular.Scale(VdotR);
+    finalSpec.Scale(0.4);
+    
+//
+//    vec3 lightDir = normalize(lightPos - fragPos);
+//    vec3 lightVec = normalize(lightDir);
+//    float ndotl = dot(normalVec, lightVec);
+//    vec3 viewDir = normalize(viewPos - fragPos);
+//    vec3 reflectDir = reflect(-lightDir, normalVec);
+//    float refl = dot(viewDir, reflectDir);
+
+    
+    //cs= Os* (𝑉∙𝑅)^p
+    //Os= the specular color of the object
+    //V = the direction to the viewer (camera)
+    //R = the reflection vector from the light source
+       // bounced off of the object
+    // reflect (I,N) returns I - 2.0* dot(N,I) * N
+    //p = the Phong exponent
+    
+    
+    Vec3 toReturn =  diffuse.Add(ambient).Add(finalSpec);
+    if (toReturn.x > 1)
+    {
+        toReturn.x =1;
+    }
+    if (toReturn.y > 1)
+    {
+        toReturn.y = 1;
+    }
+    if (toReturn.z > 1)
+    {
+        toReturn.z =1;
+    }
+    return toReturn;
+}
+
+Vec3 calculateRay(Ray ray, std::vector<Shape> shapes, bool shadow)
+{
+    float cur_z_depth = -100000;
+    float index = -1;
+    float cur_t_intersect;
+    for(int i =0; i < 3; i++)
+    {
+        float t_intersect;
+        if (shapes.at(i).shapeType == 0)
+        {
+            t_intersect = intersectsSphere(ray, shapes.at(i).location);
+        }
+        else if (shapes.at(i).shapeType == 1)
+        {
+            t_intersect = intersectstriangle(ray, shapes.at(i).location);
+        }
+        else
+        {
+            std::cout << "Error.  Invalid shapetype" << std::endl;
+            return Vec3(-1,-1,-1);
+        }
+
+        if (t_intersect > 0)
+        {
+            Vec3 intersectionPoint = ray.origin.Add(ray.direction.Scale(t_intersect));
+            if (intersectionPoint.z > cur_z_depth)
+            {
+                index = i;
+                cur_t_intersect = t_intersect;
+            }
+        }
+    }
+
+    if(index == -1) //no intersections
+    {
+        return backgroundColor;
+    }
+
+    if(shapes.at(index).shapeType == 0)
+    {
+        Vec3 intersectionPoint = ray.origin.Add(ray.direction.Scale(cur_t_intersect));
+        Vec3 normal = shapes.at(index).location.at(index).Add(intersectionPoint).Normalize();
+        
+        if(!shadow)
+        {
+            Vec3 smallPerturb = directionToLight.Scale(0.1);
+            Vec3 newOrigin = intersectionPoint.Add(smallPerturb);
+            Ray shadowRay = Ray(newOrigin, directionToLight);
+            Vec3 shadowResult = calculateRay(shadowRay, shapes, true);
+            if(shadowResult.x != backgroundColor.x || shadowResult.y != backgroundColor.y || shadowResult.z != backgroundColor.z)
+            {
+                return calculateColor(normal, shapes.at(index), ray, true);
+
+            }
+            else
+            {
+                return calculateColor(normal, shapes.at(index), ray, false);
+
+            }
+        }
+        else
+        {
+            return Vec3(1.0,0.1,0.3376);
+        }
+        //
+    }
+    else
+    {
+        if(!shadow)
+        {
+            Vec3 intersectionPoint = ray.origin.Add(ray.direction.Scale(cur_t_intersect));
+            Vec3 smallPerturb = directionToLight.Scale(0.1);
+            Vec3 newOrigin = intersectionPoint.Add(smallPerturb);
+            Ray shadowRay = Ray(newOrigin, directionToLight);
+            Vec3 shadowResult = calculateRay(shadowRay, shapes, true);
+            if(shadowResult.x != backgroundColor.x || shadowResult.y != backgroundColor.y || shadowResult.z != backgroundColor.z)
+            {
+                return calculateColor(computeNormal(shapes.at(index).location), shapes.at(index), ray, true);
+
+            }
+            else
+            {
+                return calculateColor(computeNormal(shapes.at(index).location), shapes.at(index), ray, false);
+
+            }
+        }
+        else
+        {
+                return Vec3(1.0,0.1,0.3376);
+
+        }
+         
+    }
 }
 
 int main(int argc, const char * argv[]) {
     
-    int numPixelsW = 256;
-    int numPixelsH = 256;
+    int numPixelsW = 512;
+    int numPixelsH = 512;
 //    int totNumPixels = numPixelsH*numPixelsW;
     int fov = 55;
     Vec3 cameraPos = Vec3(0,0,1.2);  //look from
@@ -293,7 +393,7 @@ int main(int argc, const char * argv[]) {
             Vec3 pixelCenter = Vec3(pixelCenterX, pixelCenterY,0);
 //            std::cout << "X : " << pixelCenterX << " Y : " << pixelCenterY << std::endl;
             Ray ray = Ray(cameraPos, pixelCenter.Subtract(cameraPos));
-            Vec3 outColor = calculateRay(ray, shapes).Scale(255);
+            Vec3 outColor = calculateRay(ray, shapes, false).Scale(255);
 //            std::cout << outColor.x << " " << outColor.y << " " << outColor.z << std::endl;
             imageFile << floor(outColor.x) << " " << floor(outColor.y) << " " << floor(outColor.z) << std::endl;
         }
