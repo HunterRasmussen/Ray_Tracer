@@ -58,15 +58,16 @@ std::ofstream initializeImageFile(std::string fileName, int numCol, int numRows)
 std::vector<Shape> initializeShapesScenell()
 {
     //circle1
-    std::vector<Vec3> sphereLocation  = {Vec3(0,0.3,0), Vec3(.2,.2,.2)};
+//    Shape(<#int shapeType_in#>, <#std::vector<Vec3> location_in#>, <#int shapeMaterial_in#>, <#Vec3 color_in#>, <#Vec3 specular_in#>, <#float phong_in#>)
+    std::vector<Vec3> sphereLocation  = {Vec3(0,0.3,0), Vec3(.1,.1,.1)};
     Shape circle = Shape(0, sphereLocation, 1, Vec3(0,0,1), Vec3(1,1,1), 4);
     //triangle 1
 //    Triangle 0 -.5 .5   1 .5 0   0 -.5 -.5    Material Diffuse 0 0 1 SpecularHighlight 1 1 1 PhongConstant 4
     std::vector<Vec3> triangleVerts = {Vec3(0,-0.5,0.5), Vec3(1,0.5,0) , Vec3(0,-0.5,-0.5)};
-    Shape tri1 = Shape(1, triangleVerts, 1, Vec3(0,0,1), Vec3(1,1,1), 4);
+    Shape tri1 = Shape(1, triangleVerts, 0, Vec3(0,0,1), Vec3(1,1,1), 4);
     
     std::vector<Vec3> triangle2Verts = {Vec3(0,-0.5,0.5), Vec3(0,-0.5,-0.5) , Vec3(-1,0.5,0)};
-    Shape tri2 = Shape(1, triangle2Verts, 1, Vec3(0,0,1), Vec3(1,1,1), 4);
+    Shape tri2 = Shape(1, triangle2Verts, 0, Vec3(1,1,0), Vec3(1,1,1), 4);
     
     std::vector<Shape> shapes = {circle, tri1, tri2};
     return shapes;
@@ -216,10 +217,16 @@ Vec3 calculateColor(Vec3 normal, Shape shape, Ray ray, bool shadow)
     Vec3 ambient = shape.color.Multiply(ambientColor);
     Vec3 diffuse = shape.color.Multiply(lightColor);
     float ndotL = normal.Dot(directionToLight);
+    if (ndotL <0)
+    {
+        ndotL = 0;
+    }
     diffuse = diffuse.Scale(ndotL);
     
     
-    Vec3 V = ray.direction.Add(ray.origin);
+    
+    Vec3 V = Vec3(-ray.direction.x, -ray.direction.y, -ray.direction.z);
+//    Vec3 V = ray.direction;
     float ndotLight = normal.Dot(directionToLight);
     ndotLight *= 2;
     Vec3 R = normal.Scale(ndotLight);
@@ -227,7 +234,7 @@ Vec3 calculateColor(Vec3 normal, Shape shape, Ray ray, bool shadow)
     float VdotR = V.Dot(R);
     VdotR = std::pow(VdotR, shape.phong);
     Vec3 finalSpec = shape.specular.Scale(VdotR);
-    finalSpec.Scale(0.4);
+//    finalSpec.Scale(4);
     
 //
 //    vec3 lightDir = normalize(lightPos - fragPos);
@@ -305,9 +312,18 @@ Vec3 calculateRay(Ray ray, std::vector<Shape> shapes, bool shadow)
     {
         Vec3 intersectionPoint = ray.origin.Add(ray.direction.Scale(cur_t_intersect));
         Vec3 normal = shapes.at(index).location.at(index).Add(intersectionPoint).Normalize();
-        
         if(!shadow)
         {
+            if(shapes.at(index).shapeMaterial == 1) // reflective.  Cast new ray
+            {
+                float reflectionAngle = 2.0 * normal.Dot(Vec3(ray.direction.x, ray.direction.y, ray.direction.z).Normalize());
+                normal = normal.Scale(reflectionAngle);
+                Vec3 reflection = Vec3(ray.direction.x, ray.direction.y, ray.direction.z).Subtract(normal);
+                Vec3 newOrigin = intersectionPoint.Add(reflection.Scale(.1));
+                Ray ray = Ray(newOrigin, reflection);
+                return calculateRay(ray, shapes, false).Scale(0.75);
+//               I - 2.0 * dot(N, I) * N
+            }
             Vec3 smallPerturb = directionToLight.Scale(0.1);
             Vec3 newOrigin = intersectionPoint.Add(smallPerturb);
             Ray shadowRay = Ray(newOrigin, directionToLight);
@@ -386,13 +402,13 @@ int main(int argc, const char * argv[]) {
     
     for (int i = 0; i < numPixelsH; i++)
     {
-        float pixelCenterY = screenTop.y - (i*pixelHeight) - (1/2 *pixelHeight);
+        float pixelCenterY = screenTop.y - (i*pixelHeight) - (0.5*pixelHeight);
         for(int j = 0; j < numPixelsW; j++)
         {
-            float pixelCenterX = screenLeft.x + (j*pixelWidth) + (1/2*pixelWidth);
+            float pixelCenterX = screenLeft.x + (j*pixelWidth) + (0.5*pixelWidth);
             Vec3 pixelCenter = Vec3(pixelCenterX, pixelCenterY,0);
 //            std::cout << "X : " << pixelCenterX << " Y : " << pixelCenterY << std::endl;
-            Ray ray = Ray(cameraPos, pixelCenter.Subtract(cameraPos));
+            Ray ray = Ray(cameraPos, pixelCenter.Subtract(cameraPos).Normalize());
             Vec3 outColor = calculateRay(ray, shapes, false).Scale(255);
 //            std::cout << outColor.x << " " << outColor.y << " " << outColor.z << std::endl;
             imageFile << floor(outColor.x) << " " << floor(outColor.y) << " " << floor(outColor.z) << std::endl;
