@@ -21,8 +21,8 @@
 # define M_PI           3.14159265358979323846  /* pi */
 
 Vec3 backgroundColor = Vec3(0.2f,0.2f,0.2f);
-Vec3 ambientColor = Vec3(0,0,0);
-Vec3 directionToLight = Vec3(0,1,0);
+Vec3 ambientColor = Vec3(0.1,0.1,0.1);
+Vec3 directionToLight = Vec3(1,0,0);
 Vec3 lightColor = Vec3(1,1,1);
 
 
@@ -49,29 +49,98 @@ std::ofstream initializeImageFile(std::string fileName, int numCol, int numRows)
     return outfile;
 }
 
+
+std::vector<Shape> initializeShapesCustom()
+{
+    
+    //circle1
+    //    BackgroundColor .2 .2 .2
+    //    Sphere Center .35 0 -.1 Radius .05 Material Diffuse 1 1 1 SpecularHighlight 1 1 1 PhongConstant 4
+    std::vector<Vec3> sphereLocation1  = {Vec3(0.35,.6,-.1), Vec3(.01,.01,.01)};
+    Shape circle1 = Shape(0, sphereLocation1, 0, Vec3(1,1,1), Vec3(1,1,1), 4);
+    //    Sphere Center .2 0 -.1 Radius .075 Material Diffuse 1 0 0 SpecularHighlight .5 1 .5 PhongConstant 32
+    std::vector<Vec3> sphereLocation2  = {Vec3(0.2,-.1,-.1), Vec3(.07,.07,.07)};
+    Shape circle2 = Shape(0, sphereLocation2, 0, Vec3(1,0,0), Vec3(.5,1,.5), 32);
+    
+    //    Sphere Center -.6 0 0 Radius .3 Material Diffuse 0 1 0 SpecularHighlight .5 1 .5 PhongConstant 32
+    std::vector<Vec3> sphereLocation3  = {Vec3(-0.6,.4,0), Vec3(.05,.05,05)};
+    Shape circle3 = Shape(0, sphereLocation3, 0, Vec3(0,1,0), Vec3(.5,1,.5), 32);
+    
+    
+    //    Sphere Center -.6 0 0 Radius .3 Material Diffuse 0 1 0 SpecularHighlight .5 1 .5 PhongConstant 32
+    std::vector<Vec3> sphereLocation4  = {Vec3(-0.1,.5,0), Vec3(.02,.05,05)};
+    Shape circle4 = Shape(0, sphereLocation4, 1, Vec3(0,1,0), Vec3(.5,1,.5), 32);
+    
+    std::vector<Vec3> sphereLocation5  = {Vec3(-0.1,0,-.8), Vec3(.2,.2, .2)};
+    Shape circle5 = Shape(0, sphereLocation5, 0, Vec3(0,0,1), Vec3(.5,1,.5), 32);
+    
+    std::vector<Vec3> sphereLocation6  = {Vec3(-0.3,-0.3,.3), Vec3(.01,.01, .01)};
+    Shape circle6 = Shape(0, sphereLocation6, 1, Vec3(0,0,1), Vec3(.5,1,.5), 32);
+    
+    std::vector<Vec3> sphereLocation7  = {Vec3(0.4,.3,-.4), Vec3(.03,.03,.03)};
+    Shape circle7 = Shape(0, sphereLocation7, 0, Vec3(1,0,0), Vec3(1,1,0), 4);
+    
+    std::vector<Vec3> sphereLocation8  = {Vec3(0.0,-0.2,.3), Vec3(.01,.01,.01)};
+    Shape circle8 = Shape(0, sphereLocation8, 0, Vec3(.3,.3,.9), Vec3(1,0,0), 16);
+    
+    std::vector<Vec3> sphereLocation9  = {Vec3(0.35,-0.2,.2), Vec3(.001,.001,.001)};
+    Shape circle9 = Shape(0, sphereLocation9, 1, Vec3(.3,.3,.9), Vec3(1,0,0), 16);
+    
+    
+    //    Triangle .3 -.3 -.4  0 .3 -.1  -.3 -.3 .2 Material Diffuse 0 0 1 SpecularHighlight 1 1 1 PhongConstant 32
+    std::vector<Vec3> triangleVerts = {Vec3(-.4,0,-1), Vec3(4,0,-1) , Vec3(0,0,10)};
+    Shape tri1 = Shape(1, triangleVerts, 0, Vec3(0,0,1), Vec3(1,1,1), 32);
+    //    Triangle  -.2 .1 .1   -.2 -.5 .2   -.2 .1 -.3 Material Diffuse 1 1 0 SpecularHighlight 1 1 1 PhongConstant 4
+//    std::vector<Vec3> triangle2Verts = {Vec3(-.2,.1,.1), Vec3(-0.2,-0.5,0.2) , Vec3(-0.2,0.1,-0.3)};
+//    Shape tri2 = Shape(1, triangle2Verts, 0, Vec3(1,1,0), Vec3(1,1,1), 4);
+    std::vector<Shape> shapes = {circle1, circle2, circle3, circle4, circle5, circle6, circle7, circle8, circle9};
+    return shapes;
+}
+
 //
-//std::vector<Shape> initializeShapesDiffuse()
-//{
-//    //circle1
-//}
+std::vector<Shape> initializeShapesDiffuse()
+{
+    //circle1
+//    BackgroundColor .2 .2 .2
+//    Sphere Center .35 0 -.1 Radius .05 Material Diffuse 1 1 1 SpecularHighlight 1 1 1 PhongConstant 4
+    std::vector<Vec3> sphereLocation1  = {Vec3(0.35,0,-.1), Vec3(.001,.001,.001)};
+    Shape circle1 = Shape(0, sphereLocation1, 0, Vec3(1,1,1), Vec3(1,1,1), 4);
+//    Sphere Center .2 0 -.1 Radius .075 Material Diffuse 1 0 0 SpecularHighlight .5 1 .5 PhongConstant 32
+    std::vector<Vec3> sphereLocation2  = {Vec3(0.2,0,-.1), Vec3(.007,.007,.007)};
+    Shape circle2 = Shape(0, sphereLocation2, 0, Vec3(1,0,0), Vec3(.5,1,.5), 32);
+
+//    Sphere Center -.6 0 0 Radius .3 Material Diffuse 0 1 0 SpecularHighlight .5 1 .5 PhongConstant 32
+    std::vector<Vec3> sphereLocation3  = {Vec3(-0.6,0,0), Vec3(.1,.1,1)};
+    Shape circle3 = Shape(0, sphereLocation3, 0, Vec3(0,1,0), Vec3(.5,1,.5), 32);
+    
+    
+//    Triangle .3 -.3 -.4  0 .3 -.1  -.3 -.3 .2 Material Diffuse 0 0 1 SpecularHighlight 1 1 1 PhongConstant 32
+    std::vector<Vec3> triangleVerts = {Vec3(.3,-0.3,-0.4), Vec3(0,0.3,-0.1) , Vec3(-0.3,-0.3,0.2)};
+    Shape tri1 = Shape(1, triangleVerts, 0, Vec3(0,0,1), Vec3(1,1,1), 32);
+//    Triangle  -.2 .1 .1   -.2 -.5 .2   -.2 .1 -.3 Material Diffuse 1 1 0 SpecularHighlight 1 1 1 PhongConstant 4
+    std::vector<Vec3> triangle2Verts = {Vec3(-.2,.1,.1), Vec3(-0.2,-0.5,0.2) , Vec3(-0.2,0.1,-0.3)};
+    Shape tri2 = Shape(1, triangle2Verts, 0, Vec3(1,1,0), Vec3(1,1,1), 4);
+    std::vector<Shape> shapes = {circle1, circle2, circle3, tri1, tri2};
+    return shapes;
+}
 //
 std::vector<Shape> initializeShapesScenell()
 {
     //circle1
-//    Shape(<#int shapeType_in#>, <#std::vector<Vec3> location_in#>, <#int shapeMaterial_in#>, <#Vec3 color_in#>, <#Vec3 specular_in#>, <#float phong_in#>)
-    std::vector<Vec3> sphereLocation  = {Vec3(0,0.3,0), Vec3(.1,.1,.1)};
+    std::vector<Vec3> sphereLocation  = {Vec3(0,0.3,0), Vec3(.02,.02,.02)};
     Shape circle = Shape(0, sphereLocation, 1, Vec3(0,0,1), Vec3(1,1,1), 4);
     //triangle 1
 //    Triangle 0 -.5 .5   1 .5 0   0 -.5 -.5    Material Diffuse 0 0 1 SpecularHighlight 1 1 1 PhongConstant 4
     std::vector<Vec3> triangleVerts = {Vec3(0,-0.5,0.5), Vec3(1,0.5,0) , Vec3(0,-0.5,-0.5)};
     Shape tri1 = Shape(1, triangleVerts, 0, Vec3(0,0,1), Vec3(1,1,1), 4);
-    
-    std::vector<Vec3> triangle2Verts = {Vec3(0,-0.5,0.5), Vec3(0,-0.5,-0.5) , Vec3(-1,0.5,0)};
+
+    std::vector<Vec3> triangle2Verts = {Vec3(0,-0.5,-0.5), Vec3(0,-0.5,0.5) , Vec3(-1,0.5,0)};
     Shape tri2 = Shape(1, triangle2Verts, 0, Vec3(1,1,0), Vec3(1,1,1), 4);
-    
+
     std::vector<Shape> shapes = {circle, tri1, tri2};
     return shapes;
 }
+
 
 
 Vec3 computeNormal(std::vector<Vec3> vertices)
@@ -98,7 +167,7 @@ float intersectstriangle(Ray ray, std::vector<Vec3> vertices)
     float vd =  normal.Dot(ray.direction);//normal dot ray origin
     if(vd > 0) //normal is facing away from camera.  Culled
     {
-        return -1.0;
+//        return -1.0;
     }
     else if(vd == 0) //ray is // to plane
     {
@@ -106,6 +175,7 @@ float intersectstriangle(Ray ray, std::vector<Vec3> vertices)
     }
     
     float vo = normal.Dot(ray.origin) + D;
+//    vo = -vo;
     float t = vo/vd;
     if (t < 0) //intersection is behind ray origin
     {
@@ -186,7 +256,7 @@ float intersectsSphere(Ray ray, std::vector<Vec3> location)
 {
     Vec3 oc = ray.origin.Subtract(location.at(0));
     float A = ray.direction.Dot(ray.direction);
-    float B = 2* ray.direction.Dot(oc);
+    float B = 2.0 * ray.direction.Dot(oc);
     float R = location.at(1).x;
     float C = oc.Dot(oc) - R;
     float discriminant = B*B - 4*A*C;
@@ -202,7 +272,7 @@ float intersectsSphere(Ray ray, std::vector<Vec3> location)
     }
     else
     {
-        return ((-B + sqrt(discriminant))/ 2*A);
+        return ((-B + sqrt(discriminant))/ (2*A));
     }
 }
 
@@ -275,7 +345,7 @@ Vec3 calculateRay(Ray ray, std::vector<Shape> shapes, bool shadow)
     float cur_z_depth = -100000;
     float index = -1;
     float cur_t_intersect;
-    for(int i =0; i < 3; i++)
+    for(int i =0; i < shapes.size(); i++)
     {
         float t_intersect;
         if (shapes.at(i).shapeType == 0)
@@ -299,6 +369,7 @@ Vec3 calculateRay(Ray ray, std::vector<Shape> shapes, bool shadow)
             {
                 index = i;
                 cur_t_intersect = t_intersect;
+                cur_z_depth = intersectionPoint.z;
             }
         }
     }
@@ -311,15 +382,16 @@ Vec3 calculateRay(Ray ray, std::vector<Shape> shapes, bool shadow)
     if(shapes.at(index).shapeType == 0)
     {
         Vec3 intersectionPoint = ray.origin.Add(ray.direction.Scale(cur_t_intersect));
-        Vec3 normal = shapes.at(index).location.at(index).Add(intersectionPoint).Normalize();
+        Vec3 normal = intersectionPoint.Subtract(shapes.at(index).location.at(0));
+        normal = normal.Normalize();
         if(!shadow)
         {
             if(shapes.at(index).shapeMaterial == 1) // reflective.  Cast new ray
             {
-                float reflectionAngle = 2.0 * normal.Dot(Vec3(ray.direction.x, ray.direction.y, ray.direction.z).Normalize());
+                float reflectionAngle = 2.0 * normal.Dot(ray.direction);
                 normal = normal.Scale(reflectionAngle);
-                Vec3 reflection = Vec3(ray.direction.x, ray.direction.y, ray.direction.z).Subtract(normal);
-                Vec3 newOrigin = intersectionPoint.Add(reflection.Scale(.1));
+                Vec3 reflection = ray.direction.Subtract(normal).Normalize();
+                Vec3 newOrigin = intersectionPoint.Add(reflection.Scale(.0001));
                 Ray ray = Ray(newOrigin, reflection);
                 return calculateRay(ray, shapes, false).Scale(0.75);
 //               I - 2.0 * dot(N, I) * N
@@ -378,12 +450,31 @@ int main(int argc, const char * argv[]) {
     
     int numPixelsW = 512;
     int numPixelsH = 512;
-//    int totNumPixels = numPixelsH*numPixelsW;
-    int fov = 55;
-    Vec3 cameraPos = Vec3(0,0,1.2);  //look from
-//    Vec3 cameraUp = Vec3(0,1,0);
-    float distToScreen = 1.2f;
-//    Vec3 lookat = Vec3(0,0,0);
+    bool scenell = false;
+    int fov;
+    Vec3 cameraPos;
+    float distToScreen;
+    std::string fileName;
+    std::vector<Shape> shapes;
+    if(scenell)
+    {
+        fov = 55;
+        cameraPos = Vec3(0,0,1.2);  //look from
+        distToScreen = 1.2f;
+        fileName = "scenell.ppm";
+        shapes = initializeShapesScenell();
+
+    }
+    else
+    {
+        fov = 28;
+        cameraPos = Vec3(0,0,1.0).Normalize();  //look from
+        distToScreen = 1.0f;
+        fileName = "custom.ppm";
+        shapes = initializeShapesCustom();
+
+    }
+
     float screenWidth = 2* tan(fov * M_PI/180) * distToScreen;
     float pixelWidth = screenWidth/numPixelsW;
     //assuming square image plane
@@ -391,14 +482,10 @@ int main(int argc, const char * argv[]) {
     float screenleftx =  -screenWidth/2;
     float screenTopy = screenWidth/2;
     Vec3 screenLeft = Vec3(screenleftx , 0,0);
-//    Vec3 screenRight = Vec3(1/2 *screenWidth,0,0);
     Vec3 screenTop = Vec3(0,screenTopy,0);
-//    Vec3 screenBot = Vec3(0, -1/2 * screenWidth,0);
     std::cout <<"screenLeft = " << screenLeft.x << " screen top = " << screenTop.y << std::endl;
-    std::string fileName = "diffuse.ppm";
     std::ofstream imageFile = initializeImageFile(fileName, numPixelsW, numPixelsH);
     imageFile.flush();
-    std::vector<Shape> shapes = initializeShapesScenell();
     
     for (int i = 0; i < numPixelsH; i++)
     {
